@@ -1,20 +1,18 @@
-package com.renault.garage.model;
+package com.renault.garage.dto;
 
-import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalTime;
 
-@Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OpeningTime {
+public class OpeningTimeDTO {
 
-    @NotNull
+    @NotNull(message = "Start time is required.")
     private LocalTime startTime;
 
-    @NotNull
+    @NotNull(message = "End time is required.")
     private LocalTime endTime;
 }
