@@ -1,6 +1,6 @@
 package com.renault.garage.controller;
 
-import com.renault.garage.dto.*;
+
 import com.renault.garage.dto.request.AccessoryRequestDTO;
 import com.renault.garage.dto.response.AccessoryResponseDTO;
 import com.renault.garage.service.AccessoryService;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/accessories")
@@ -45,13 +44,5 @@ public class AccessoryController {
     public ResponseEntity<List<AccessoryResponseDTO>> getAccessoriesByVehicle(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(accessoryService.getAccessoriesByVehicle(vehicleId));
     }
-
-    @Operation(summary = "Check if an accessory is available in at least one vehicle")
-    @GetMapping("/available")
-    public ResponseEntity<Boolean> isAccessoryAvailable(@RequestParam String name) {
-        boolean available = accessoryService.isAccessoryAvailable(name);
-        return ResponseEntity.ok(available);
-    }
-
 
 }

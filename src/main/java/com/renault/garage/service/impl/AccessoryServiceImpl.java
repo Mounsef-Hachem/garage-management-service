@@ -1,6 +1,6 @@
 package com.renault.garage.service.impl;
 
-import com.renault.garage.dto.*;
+
 import com.renault.garage.dto.request.AccessoryRequestDTO;
 import com.renault.garage.dto.response.AccessoryResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
@@ -10,9 +10,9 @@ import com.renault.garage.model.Vehicle;
 import com.renault.garage.repository.AccessoryRepository;
 import com.renault.garage.repository.VehicleRepository;
 import com.renault.garage.service.AccessoryService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -61,13 +61,4 @@ public class AccessoryServiceImpl implements AccessoryService {
         accessoryRepository.deleteById(id);
     }
 
-    @Override
-    public boolean isAccessoryAvailable(String name) {
-        return accessoryRepository.existsByNameIgnoreCaseAndVehicleIsNotNull(name);
-    }
-
-    @Override
-    public boolean isAccessoryAvailableInGarage(Long garageId, String name) {
-        return accessoryRepository.existsByNameIgnoreCaseAndVehicle_Garage_Id(name, garageId);
-    }
 }

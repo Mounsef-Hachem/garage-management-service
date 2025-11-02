@@ -16,7 +16,4 @@ public interface AccessoryService {
 
     void deleteAccessory(Long id);
 
-    boolean isAccessoryAvailable(String name);
-
-    boolean isAccessoryAvailableInGarage(Long garageId, String name);
 }
