@@ -88,5 +88,38 @@ public class OpeningTime {
 
 Solution 1 is implemented to match the specification and keep the implementation compact; Solution 2 is preferable if the domain requires multiple ranges per day or advanced time queries.
 
+---
+
 **7) Running & testing**
+
+- **Run the application**
+
+  To start the API locally:
+
+```bash
+
+./mvnw spring-boot:run
+
+```
+
+-  The application will start on 👉 http://localhost:8080
+
+-  Swagger UI documentation is available at: 👉 http://localhost:8080/swagger-ui/index.html
+
+
+- **Run unit tests**
+
+    To execute all unit and integration tests:
+
+```bash
+
+./mvnw test
+
+```
+
+    This will:
+        - Automatically start an in-memory H2 database.
+        - Run all JUnit tests located under src/test/java.
+        - Display test results in the console.
+---
 
