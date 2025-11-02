@@ -16,4 +16,6 @@ public interface GarageRepository extends JpaRepository<Garage, Long>, JpaSpecif
     List<Garage> findByAddressContainingIgnoreCase(String keyword);
 
     boolean existsByEmail(String email);
+
+    List<Garage> findDistinctByVehicles_Accessories_NameIgnoreCase(String accessoryName);
 }

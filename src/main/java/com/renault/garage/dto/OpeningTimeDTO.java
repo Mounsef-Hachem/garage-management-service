@@ -1,18 +1,20 @@
 package com.renault.garage.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class OpeningTimeDTO {
+@Schema(description = "Represents an opening time slot for a specific day.")
+public record OpeningTimeDTO(
 
-    @NotNull(message = "Start time is required.")
-    private LocalTime startTime;
+        @Schema(
+                description = "Start time of the opening period",
+                example = "08:00:00"
+        )
+        LocalTime startTime,
 
-    @NotNull(message = "End time is required.")
-    private LocalTime endTime;
-}
+        @Schema(
+                description = "End time of the opening period",
+                example = "12:00:00"
+        )
+        LocalTime endTime
+) {}

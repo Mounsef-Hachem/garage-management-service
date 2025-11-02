@@ -3,7 +3,8 @@ package com.renault.garage.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vehicles")
@@ -20,17 +21,18 @@ public class Vehicle {
     @NotBlank
     private String brand;
 
-    @NotBlank
-    private int yearOfManufacture;
+    @NotNull
+    @Column(name = "manufacturing_year")
+    private Integer manufacturingYear;
 
     @NotBlank
     @Column(name = "fuel_type")
     private String fuelType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "garage_id")
     private Garage garage;
 
-    @OneToMany(mappedBy = "vehicle ", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Accessory> accessories = new ArrayList<>();
 }

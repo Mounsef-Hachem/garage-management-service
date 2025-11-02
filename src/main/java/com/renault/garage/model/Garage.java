@@ -1,11 +1,17 @@
 package com.renault.garage.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "garages")
@@ -19,31 +25,21 @@ public class Garage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false, unique = true)
     private String name;
-
-    @NotBlank
-    @Column(nullable = false)
     private String address;
-
-    @NotBlank
-    @Column(nullable = false)
-    private String phone;
-
-    @Email
-    @Column(nullable = false)
+    private String telephone;
     private String email;
 
-    /**
-     * Key = day of the week
-     * Value = list of opening slots
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "garage_opening_hours", joinColumns = @JoinColumn(name = "garage_id"))
+    @ElementCollection
+    @CollectionTable(name = "garage_opening_times", joinColumns = @JoinColumn(name = "garage_id"))
     @MapKeyColumn(name = "day_of_week")
-    private Map<DayOfWeek, List<OpeningTime>> OpeningTimes = new HashMap<>();
+    private Map<DayOfWeek, OpeningTime> openingHours = new HashMap<>();
 
-    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection
+    @CollectionTable(name = "garage_supported_vehicle_types", joinColumns = @JoinColumn(name = "garage_id"))
+    @Column(name = "vehicle_type")
+    private Set<String> supportedVehicleTypes = new HashSet<>();
+
+    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Vehicle> vehicles = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-package com.renault.garage.exception;
+package com.renault.garage.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

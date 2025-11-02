@@ -19,10 +19,11 @@ public class Accessory {
     @NotBlank
     private String name;
 
+    @NotBlank
     private String description;
 
-    @Positive
-    private double price;
+    @NotNull
+    private Double price;
 
     @NotBlank
     private String type;

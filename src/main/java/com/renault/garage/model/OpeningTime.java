@@ -1,8 +1,12 @@
 package com.renault.garage.model;
 
+
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalTime;
 
 @Embeddable
@@ -12,9 +16,6 @@ import java.time.LocalTime;
 @Builder
 public class OpeningTime {
 
-    @NotNull
     private LocalTime startTime;
-
-    @NotNull
     private LocalTime endTime;
 }
