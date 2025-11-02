@@ -17,11 +17,9 @@ public interface VehicleMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateVehicleFromDTO(VehicleRequestDTO dto, @MappingTarget Vehicle entity);
 
-    // Added: map lists of entities/dtos
     List<VehicleResponseDTO> toVehicleResponseDTOList(List<Vehicle> entities);
 
-    // Keep original name used by service impl
     List<VehicleResponseDTO> toResponseDTOList(List<Vehicle> entities);
 
-    List<Vehicle> toEntityList(List<VehicleRequestDTO> dtos);
+    List<Vehicle> toEntityList(List<VehicleRequestDTO> dto);
 }

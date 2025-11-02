@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,16 +70,15 @@ public class GarageServiceImpl implements GarageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getSupportedVehicleTypes(Long garageId) {
-        Garage garage = garageRepository.findById(garageId)
-                .orElseThrow(() -> new ResourceNotFoundException("Garage not found with id: " + garageId));
-        return garage.getSupportedVehicleTypes();
+    public List<Garage> getSupportedVehicleTypes(String vehicleType) {
+        return garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(vehicleType)
+                .stream().toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<GarageResponseDTO> findGaragesByAccessory(String accessoryName) {
-        List<Garage> garages = garageRepository.findDistinctByVehicles_Accessories_NameIgnoreCase(accessoryName);
+        List<Garage> garages = garageRepository.findByVehicles_Accessories_NameIgnoreCase(accessoryName);
         return garages.stream().map(garageMapper::toResponseDTO).toList();
     }
 }

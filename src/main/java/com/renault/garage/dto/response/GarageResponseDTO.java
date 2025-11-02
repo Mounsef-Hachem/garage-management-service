@@ -1,6 +1,6 @@
 package com.renault.garage.dto.response;
 
-import com.renault.garage.dto.OpeningTimeDTO;
+import com.renault.garage.dto.request.OpeningTimeDTO;
 import com.renault.garage.model.DayOfWeek;
 import lombok.*;
 import java.util.List;

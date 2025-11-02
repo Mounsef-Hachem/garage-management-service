@@ -1,7 +1,7 @@
 package com.renault.garage.mapper;
 
 import com.renault.garage.model.OpeningTime;
-import com.renault.garage.dto.OpeningTimeDTO;
+import com.renault.garage.dto.request.OpeningTimeDTO;
 import org.mapstruct.*;
 
 import java.util.List;

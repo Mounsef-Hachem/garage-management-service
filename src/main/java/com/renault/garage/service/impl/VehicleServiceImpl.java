@@ -3,6 +3,7 @@ package com.renault.garage.service.impl;
 import com.renault.garage.dto.request.VehicleRequestDTO;
 import com.renault.garage.dto.response.VehicleResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
+import com.renault.garage.exception.StorageLimitExceededException;
 import com.renault.garage.mapper.VehicleMapper;
 import com.renault.garage.model.Garage;
 import com.renault.garage.model.Vehicle;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class VehicleServiceImpl implements VehicleService {
 
+    private static final int GARAGE_VEHICLE_QUOTA = 50;
+
     private final GarageRepository garageRepository;
     private final VehicleRepository vehicleRepository;
     private final VehicleMapper vehicleMapper;
@@ -29,6 +32,11 @@ public class VehicleServiceImpl implements VehicleService {
     public VehicleResponseDTO createVehicle(Long garageId, VehicleRequestDTO dto) {
         Garage garage = garageRepository.findById(garageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garage not found with id: " + garageId));
+
+        long currentCount = vehicleRepository.countByGarage_Id(garageId);
+        if (currentCount >= GARAGE_VEHICLE_QUOTA) {
+            throw new StorageLimitExceededException("Garage " + garageId + " has reached its storage quota of " + GARAGE_VEHICLE_QUOTA + " vehicles.");
+        }
 
         Vehicle vehicle = vehicleMapper.toEntity(dto);
         vehicle.setGarage(garage);

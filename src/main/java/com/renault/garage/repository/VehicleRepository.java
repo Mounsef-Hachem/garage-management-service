@@ -18,4 +18,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     List<Vehicle> findByBrandContainingIgnoreCaseAndGarageIdIn(String brand, List<Long> garageIds);
 
+    // Count vehicles in a garage (used to enforce storage quota)
+    long countByGarage_Id(Long garageId);
+
 }

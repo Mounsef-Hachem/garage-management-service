@@ -1,6 +1,5 @@
 package com.renault.garage.dto.request;
 
-import com.renault.garage.dto.OpeningTimeDTO;
 import com.renault.garage.model.DayOfWeek;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

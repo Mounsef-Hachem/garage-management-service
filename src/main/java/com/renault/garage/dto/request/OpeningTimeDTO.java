@@ -1,4 +1,4 @@
-package com.renault.garage.dto;
+package com.renault.garage.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;

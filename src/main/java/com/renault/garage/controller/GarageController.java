@@ -1,10 +1,9 @@
 package com.renault.garage.controller;
 
-import com.renault.garage.dto.*;
+
 import com.renault.garage.dto.request.GarageRequestDTO;
-import com.renault.garage.dto.request.VehicleRequestDTO;
 import com.renault.garage.dto.response.GarageResponseDTO;
-import com.renault.garage.dto.response.VehicleResponseDTO;
+import com.renault.garage.model.Garage;
 import com.renault.garage.service.GarageService;
 import com.renault.garage.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/garages")
@@ -62,10 +60,10 @@ public class GarageController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get supported vehicle types for a garage")
-    @GetMapping("/{id}/supported-vehicle-types")
-    public ResponseEntity<Set<String>> getSupportedVehicleTypes(@PathVariable Long id) {
-        return ResponseEntity.ok(garageService.getSupportedVehicleTypes(id));
+    @Operation(summary = "Get garage by supported vehicle")
+    @GetMapping("/supported-vehicle/{vehicleType}")
+    public ResponseEntity<List<Garage>> getSupportedVehicleTypes(@PathVariable String vehicleType) {
+        return ResponseEntity.ok(garageService.getSupportedVehicleTypes(vehicleType));
     }
 
     @Operation(summary = "Search garages that have at least one vehicle containing an accessory with the given name")
