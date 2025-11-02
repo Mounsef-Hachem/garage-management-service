@@ -1,10 +1,14 @@
 package com.renault.garage.mapper;
 
+
 import com.renault.garage.dto.request.AccessoryRequestDTO;
 import com.renault.garage.dto.response.AccessoryResponseDTO;
 import com.renault.garage.model.Accessory;
-import com.renault.garage.dto.*;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")

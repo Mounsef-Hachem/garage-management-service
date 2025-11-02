@@ -1,10 +1,9 @@
 package com.renault.garage.controller;
 
-import com.renault.garage.dto.*;
+
 import com.renault.garage.dto.request.VehicleRequestDTO;
 import com.renault.garage.dto.response.VehicleResponseDTO;
 import com.renault.garage.service.VehicleService;
-import com.renault.garage.service.AccessoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
