@@ -16,10 +16,6 @@ public interface VehicleMapper {
     @Mapping(target = "accessories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateVehicleFromDTO(VehicleRequestDTO dto, @MappingTarget Vehicle entity);
-
     List<VehicleResponseDTO> toVehicleResponseDTOList(List<Vehicle> entities);
 
-    List<VehicleResponseDTO> toResponseDTOList(List<Vehicle> entities);
-
-    List<Vehicle> toEntityList(List<VehicleRequestDTO> dto);
 }

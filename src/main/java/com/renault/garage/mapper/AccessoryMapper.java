@@ -9,7 +9,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface AccessoryMapper {
@@ -18,10 +17,6 @@ public interface AccessoryMapper {
     Accessory toEntity(AccessoryRequestDTO dto);
 
     AccessoryResponseDTO toResponseDTO(Accessory entity);
-
-    List<Accessory> toEntityList(List<AccessoryResponseDTO> dtos);
-
-    List<AccessoryResponseDTO> toResponseDTOList(List<Accessory> entities);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateAccessory(AccessoryRequestDTO dto, @MappingTarget Accessory entity);

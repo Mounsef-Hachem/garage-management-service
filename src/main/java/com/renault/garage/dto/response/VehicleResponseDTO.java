@@ -1,7 +1,6 @@
 package com.renault.garage.dto.response;
 
 import lombok.*;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

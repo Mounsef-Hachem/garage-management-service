@@ -15,12 +15,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface GarageMapper {
 
-//    @Mapping(target = "openingHours", expression = "java(mapOpeningHoursToDTO(garage.getOpeningHours()))")
     GarageResponseDTO toResponseDTO(Garage garage);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
-    @Mapping(target = "openingHours", expression = "java(mapOpeningHoursToEntity(requestDTO.openingHours()))")
     Garage toEntity(GarageRequestDTO requestDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -54,8 +52,8 @@ public interface GarageMapper {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().isEmpty() ? null : OpeningTime.builder()
-                                .startTime(e.getValue().get(0).startTime())
-                                .endTime(e.getValue().get(0).endTime())
+                                .startTime(e.getValue().getFirst().startTime())
+                                .endTime(e.getValue().getFirst().endTime())
                                 .build()
                 ));
     }

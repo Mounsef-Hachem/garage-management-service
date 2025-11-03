@@ -11,12 +11,6 @@ import java.util.Optional;
 @Repository
 public interface GarageRepository extends JpaRepository<Garage, Long>, JpaSpecificationExecutor<Garage> {
 
-    Optional<Garage> findByName(String name);
-
-    List<Garage> findByAddressContainingIgnoreCase(String keyword);
-
-    boolean existsByEmail(String email);
-
     List<Garage> findByVehicles_Accessories_NameIgnoreCase(String accessoryName);
 
     List<Garage> findBySupportedVehicleTypesContainingIgnoreCase(String vehicleType);

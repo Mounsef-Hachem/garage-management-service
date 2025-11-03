@@ -79,6 +79,7 @@ class AccessoryServiceImplTest {
         AccessoryResponseDTO result = accessoryService.createAccessory(1L, requestDTO);
 
         assertThat(result).isEqualTo(responseDTO);
+
         verify(vehicleRepository).findById(1L);
         verify(accessoryRepository).save(any(Accessory.class));
         verify(accessoryMapper).toResponseDTO(any(Accessory.class));
@@ -114,6 +115,7 @@ class AccessoryServiceImplTest {
         AccessoryResponseDTO result = accessoryService.updateAccessory(7L, requestDTO);
 
         assertThat(result).isEqualTo(responseDTO);
+
         verify(accessoryRepository).findById(7L);
         verify(accessoryMapper).updateAccessory(any(AccessoryRequestDTO.class), any(Accessory.class));
         verify(accessoryRepository).save(existing);
@@ -137,7 +139,8 @@ class AccessoryServiceImplTest {
         List<AccessoryResponseDTO> result = accessoryService.getAccessoriesByVehicle(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(responseDTO);
+        assertThat(result.getFirst()).isEqualTo(responseDTO);
+
         verify(accessoryRepository).findByVehicle_Id(1L);
         verify(accessoryMapper).toResponseDTO(any(Accessory.class));
     }

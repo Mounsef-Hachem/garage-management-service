@@ -94,7 +94,8 @@ class GarageServiceImplTest {
 
         GarageResponseDTO result = garageService.updateGarage(id, request);
 
-        assertThat(result).isSameAs(responseDTO);
+        assertThat(result).isEqualTo(responseDTO);
+
         verify(garageRepository).findById(id);
         verify(garageMapper).updateGarageFromDto(request, existing);
         verify(garageRepository).save(existing);
@@ -108,6 +109,7 @@ class GarageServiceImplTest {
         when(garageRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> garageService.updateGarage(id, request));
+
         verify(garageRepository).findById(id);
         verifyNoMoreInteractions(garageMapper);
     }
@@ -123,7 +125,8 @@ class GarageServiceImplTest {
 
         GarageResponseDTO result = garageService.getGarageById(id);
 
-        assertThat(result).isSameAs(responseDTO);
+        assertThat(result).isEqualTo(responseDTO);
+
         verify(garageRepository).findById(id);
         verify(garageMapper).toResponseDTO(entity);
     }
@@ -142,8 +145,8 @@ class GarageServiceImplTest {
         List<GarageResponseDTO> result = garageService.getAllGarages(pageable);
 
         assertThat(result).hasSize(2);
+
         verify(garageRepository).findAll(pageable);
-        // mapper may be invoked multiple times depending on internal streaming; verify total invocations
         verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
     }
 
@@ -164,6 +167,7 @@ class GarageServiceImplTest {
         when(garageRepository.existsById(id)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> garageService.deleteGarage(id));
+
         verify(garageRepository).existsById(id);
         verify(garageRepository, never()).deleteById(any());
     }
@@ -179,6 +183,7 @@ class GarageServiceImplTest {
         List<Garage> result = garageService.getSupportedVehicleTypes(vehicleType);
 
         assertThat(result).containsExactly(g1, g2);
+
         verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase(vehicleType);
     }
 
@@ -192,6 +197,7 @@ class GarageServiceImplTest {
 
         when(garageRepository.findByVehicles_Accessories_NameIgnoreCase(accessoryName))
                 .thenReturn(List.of(g1, g2));
+
         // Return different DTOs depending on the garage instance
         when(garageMapper.toResponseDTO(any(Garage.class))).thenAnswer(invocation -> {
             Garage arg = invocation.getArgument(0);
@@ -202,8 +208,8 @@ class GarageServiceImplTest {
 
         List<GarageResponseDTO> result = garageService.findGaragesByAccessory(accessoryName);
 
-        // result may preserve order; relax assertion to check contents regardless of order
         assertThat(result).containsExactlyInAnyOrder(dto1, dto2);
+
         verify(garageRepository).findByVehicles_Accessories_NameIgnoreCase(accessoryName);
         verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
     }

@@ -2,8 +2,6 @@ package com.renault.garage.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.List;
-
 @Schema(description = "Represents the request for creating or updating a vehicle.")
 public record VehicleRequestDTO(
 

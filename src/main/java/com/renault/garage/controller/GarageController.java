@@ -5,7 +5,6 @@ import com.renault.garage.dto.request.GarageRequestDTO;
 import com.renault.garage.dto.response.GarageResponseDTO;
 import com.renault.garage.model.Garage;
 import com.renault.garage.service.GarageService;
-import com.renault.garage.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -23,7 +22,6 @@ import java.util.List;
 public class GarageController {
 
     private final GarageService garageService;
-    private final VehicleService vehicleService;
 
     @Operation(summary = "Create a new garage")
     @PostMapping

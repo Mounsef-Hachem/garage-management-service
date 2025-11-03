@@ -80,6 +80,7 @@ class VehicleServiceImplTest {
         VehicleResponseDTO result = vehicleService.createVehicle(1L, sampleRequest);
 
         assertThat(result).isEqualTo(sampleResponse);
+
         verify(garageRepository).findById(1L);
         verify(vehicleRepository).countByGarage_Id(1L);
         verify(vehicleRepository).save(any(Vehicle.class));
@@ -117,7 +118,8 @@ class VehicleServiceImplTest {
         List<VehicleResponseDTO> result = vehicleService.getVehicleByGarage(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(sampleResponse);
+        assertThat(result.getFirst()).isEqualTo(sampleResponse);
+
         verify(garageRepository).findById(1L);
         verify(vehicleRepository).findByGarage(sampleGarage);
         verify(vehicleMapper).toVehicleResponseDTOList(anyList());
@@ -142,6 +144,7 @@ class VehicleServiceImplTest {
         VehicleResponseDTO result = vehicleService.updateVehicle(20L, sampleRequest);
 
         assertThat(result).isEqualTo(sampleResponse);
+
         verify(vehicleRepository).findById(20L);
         verify(vehicleMapper).updateVehicleFromDTO(any(VehicleRequestDTO.class), any(Vehicle.class));
         verify(vehicleRepository).save(existing);
@@ -166,7 +169,8 @@ class VehicleServiceImplTest {
         List<VehicleResponseDTO> result = vehicleService.getVehiclesByBrandAndGarages("Renault", null);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(sampleResponse);
+
+        assertThat(result.getFirst()).isEqualTo(sampleResponse);
         verify(vehicleRepository).findByBrandContainingIgnoreCase("Renault");
         verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
     }
@@ -180,7 +184,7 @@ class VehicleServiceImplTest {
         List<VehicleResponseDTO> result = vehicleService.getVehiclesByBrandAndGarages("Renault", List.of(1L, 2L));
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(sampleResponse);
+        assertThat(result.getFirst()).isEqualTo(sampleResponse);
         verify(vehicleRepository).findByBrandContainingIgnoreCaseAndGarageIdIn("Renault", List.of(1L, 2L));
         verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
     }
