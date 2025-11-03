@@ -4,6 +4,7 @@ import com.renault.garage.dto.request.VehicleRequestDTO;
 import com.renault.garage.dto.response.VehicleResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
 import com.renault.garage.exception.StorageLimitExceededException;
+import com.renault.garage.kafka.VehicleEventPublisher;
 import com.renault.garage.mapper.VehicleMapper;
 import com.renault.garage.model.Garage;
 import com.renault.garage.model.Vehicle;
@@ -27,6 +28,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final GarageRepository garageRepository;
     private final VehicleRepository vehicleRepository;
     private final VehicleMapper vehicleMapper;
+    private final VehicleEventPublisher vehicleEventPublisher;
 
     @Override
     public VehicleResponseDTO createVehicle(Long garageId, VehicleRequestDTO dto) {
@@ -41,7 +43,11 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle vehicle = vehicleMapper.toEntity(dto);
         vehicle.setGarage(garage);
 
-        return vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
+        VehicleResponseDTO responseDTO = vehicleMapper.toResponseDTO(vehicleRepository.save(vehicle));
+
+        vehicleEventPublisher.publishVehicleCreated(responseDTO);
+
+        return responseDTO;
     }
 
     @Override

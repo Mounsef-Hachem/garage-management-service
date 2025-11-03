@@ -4,6 +4,7 @@ import com.renault.garage.dto.request.VehicleRequestDTO;
 import com.renault.garage.dto.response.VehicleResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
 import com.renault.garage.exception.StorageLimitExceededException;
+import com.renault.garage.kafka.VehicleEventPublisher;
 import com.renault.garage.mapper.VehicleMapper;
 import com.renault.garage.model.Garage;
 import com.renault.garage.model.Vehicle;
@@ -36,6 +37,9 @@ class VehicleServiceImplTest {
 
     @Mock
     private VehicleMapper vehicleMapper;
+
+    @Mock
+    private VehicleEventPublisher eventPublisher;
 
     @InjectMocks
     private VehicleServiceImpl vehicleService;
@@ -85,6 +89,7 @@ class VehicleServiceImplTest {
         verify(vehicleRepository).countByGarage_Id(1L);
         verify(vehicleRepository).save(any(Vehicle.class));
         verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
+        verify(eventPublisher).publishVehicleCreated(any(VehicleResponseDTO.class));
     }
 
     @Test
