@@ -1,4 +1,17 @@
 package com.renault.garage.repository;
 
-public interface GarageRepository {
+import com.renault.garage.model.Garage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface GarageRepository extends JpaRepository<Garage, Long>, JpaSpecificationExecutor<Garage> {
+
+    List<Garage> findByVehicles_Accessories_NameIgnoreCase(String accessoryName);
+
+    List<Garage> findBySupportedVehicleTypesContainingIgnoreCase(String vehicleType);
 }
