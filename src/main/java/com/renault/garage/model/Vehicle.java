@@ -8,10 +8,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "vehicles")
-@Data
+@Setter
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Vehicle {
 
     @Id
@@ -21,11 +22,9 @@ public class Vehicle {
     @NotBlank
     private String brand;
 
-    @NotNull
     @Column(name = "manufacturing_year")
     private Integer manufacturingYear;
 
-    @NotBlank
     @Column(name = "fuel_type")
     private String fuelType;
 

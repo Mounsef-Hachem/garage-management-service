@@ -2,9 +2,11 @@ package com.renault.garage.kafka;
 
 import com.renault.garage.dto.response.VehicleResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class VehicleEventPublisher {
@@ -14,6 +16,7 @@ public class VehicleEventPublisher {
 
     public void publishVehicleCreated(VehicleResponseDTO vehicleResponse) {
         kafkaTemplate.send(TOPIC, vehicleResponse);
-        System.out.println("Vehicle event published to Kafka: " + vehicleResponse);
+        log.info("Vehicle event published to Kafka topic '{}': {}", TOPIC, vehicleResponse);
+
     }
 }

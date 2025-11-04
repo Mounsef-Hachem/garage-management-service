@@ -45,19 +45,27 @@ class AccessoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        vehicle = new Vehicle();
-        vehicle.setId(1L);
+        vehicle = Vehicle
+                .builder()
+                .id(1L)
+                .brand("Renault")
+                .fuelType("Diesel")
+                .manufacturingYear(2020)
+                .build();
+
 
         requestDTO = new AccessoryRequestDTO("GPS", "Navigator", 199.99, "Multimedia");
 
-        accessoryEntity = new Accessory();
-        accessoryEntity.setName("GPS");
-        accessoryEntity.setDescription("Navigator");
-        accessoryEntity.setPrice(199.99);
-        accessoryEntity.setType("Multimedia");
+        accessoryEntity = Accessory
+                .builder()
+                .name("GPS")
+                .description("Navigator")
+                .price(199.99)
+                .type("Multimedia")
+                .build();
 
         responseDTO = AccessoryResponseDTO.builder()
-                .id(5L)
+                .id(1L)
                 .name("GPS")
                 .description("Navigator")
                 .price(199.99)
@@ -68,12 +76,8 @@ class AccessoryServiceImplTest {
     @Test
     void createAccessory_success() {
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
-        when(accessoryMapper.toEntity(requestDTO)).thenReturn(accessoryEntity);
-        when(accessoryRepository.save(any(Accessory.class))).thenAnswer(invocation -> {
-            Accessory a = invocation.getArgument(0);
-            a.setId(5L);
-            return a;
-        });
+        when(accessoryMapper.toEntity(any(AccessoryRequestDTO.class))).thenReturn(accessoryEntity);
+        when(accessoryRepository.save(any(Accessory.class))).thenReturn(accessoryEntity);
         when(accessoryMapper.toResponseDTO(any(Accessory.class))).thenReturn(responseDTO);
 
         AccessoryResponseDTO result = accessoryService.createAccessory(1L, requestDTO);
@@ -97,29 +101,29 @@ class AccessoryServiceImplTest {
 
     @Test
     void updateAccessory_success() {
-        Accessory existing = new Accessory();
-        existing.setId(7L);
-        when(accessoryRepository.findById(7L)).thenReturn(Optional.of(existing));
+
+        when(accessoryRepository.findById(1L)).thenReturn(Optional.of(accessoryEntity));
         doAnswer(invocation -> {
             AccessoryRequestDTO dto = invocation.getArgument(0);
-            Accessory ent = invocation.getArgument(1);
-            ent.setName(dto.name());
-            ent.setDescription(dto.description());
-            ent.setPrice(dto.price());
-            ent.setType(dto.type());
+            Accessory entity = invocation.getArgument(1);
+            entity.setName(dto.name());
+            entity.setDescription(dto.description());
+            entity.setPrice(dto.price());
+            entity.setType(dto.type());
             return null;
         }).when(accessoryMapper).updateAccessory(any(AccessoryRequestDTO.class), any(Accessory.class));
-        when(accessoryRepository.save(existing)).thenReturn(existing);
-        when(accessoryMapper.toResponseDTO(existing)).thenReturn(responseDTO);
 
-        AccessoryResponseDTO result = accessoryService.updateAccessory(7L, requestDTO);
+        when(accessoryRepository.save(any(Accessory.class))).thenReturn(accessoryEntity);
+        when(accessoryMapper.toResponseDTO(accessoryEntity)).thenReturn(responseDTO);
+
+        AccessoryResponseDTO result = accessoryService.updateAccessory(1L, requestDTO);
 
         assertThat(result).isEqualTo(responseDTO);
 
-        verify(accessoryRepository).findById(7L);
+        verify(accessoryRepository).findById(1L);
         verify(accessoryMapper).updateAccessory(any(AccessoryRequestDTO.class), any(Accessory.class));
-        verify(accessoryRepository).save(existing);
-        verify(accessoryMapper).toResponseDTO(existing);
+        verify(accessoryRepository).save(any(Accessory.class));
+        verify(accessoryMapper).toResponseDTO(any(Accessory.class));
     }
 
     @Test
@@ -159,7 +163,7 @@ class AccessoryServiceImplTest {
     void deleteAccessory_missing_shouldThrow() {
         when(accessoryRepository.existsById(8L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> accessoryService.deleteAccessory(8L));
+        assertThrows(ResourceNotFoundException.class, () -> accessoryService.deleteAccessory(8L));
 
         verify(accessoryRepository).existsById(8L);
         verify(accessoryRepository, never()).deleteById(anyLong());

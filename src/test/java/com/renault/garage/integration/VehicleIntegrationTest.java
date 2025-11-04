@@ -45,11 +45,14 @@ class VehicleIntegrationTest {
 
     @BeforeEach
     void setup() {
-        garage = new Garage();
-        garage.setName("Test Garage");
-        garage.setAddress("123 Test Street");
-        garage.setTelephone("1234567890");
-        garage.setEmail("test@garage.com");
+        garage = Garage
+                .builder()
+                .name("Test Garage")
+                .address("123 Test Street")
+                .telephone("1234567890")
+                .email("test@garage.com")
+                .build();
+
         garage = garageRepository.save(garage);
     }
 
@@ -62,7 +65,9 @@ class VehicleIntegrationTest {
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.brand").value("Renault"))
-                .andExpect(jsonPath("$.manufacturingYear").value(2020));
+                .andExpect(jsonPath("$.manufacturingYear").value(2020))
+                .andExpect(jsonPath("$.fuelType").value("Diesel"));
+
 
         // Verify the vehicle is actually persisted
         List<Vehicle> vehicles = vehicleRepository.findAll();
