@@ -2,10 +2,6 @@ package com.renault.garage.dto.response;
 
 import lombok.*;
 
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class AccessoryResponseDTO {
 

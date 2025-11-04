@@ -56,7 +56,7 @@ public class AccessoryServiceImpl implements AccessoryService {
     @Override
     public void deleteAccessory(Long id) {
         if (!accessoryRepository.existsById(id)) {
-            throw new RuntimeException("Accessory not found with id: " + id);
+            throw new ResourceNotFoundException("Accessory not found with id: " + id);
         }
         accessoryRepository.deleteById(id);
     }

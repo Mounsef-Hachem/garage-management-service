@@ -28,33 +28,38 @@ public interface GarageMapper {
     void updateGarageFromDto(GarageRequestDTO dto, @MappingTarget Garage garage);
 
 
-//    // Map<DayOfWeek, List<OpeningTime>> → Map<DayOfWeek, List<OpeningTimeDTO>>
-    default Map<DayOfWeek, List<OpeningTimeDTO>> mapOpeningHoursToDTO(
+    // Map<DayOfWeek, OpeningTime> → Map<DayOfWeek, OpeningTimeDTO>
+    default Map<DayOfWeek, OpeningTimeDTO> mapOpeningHoursToDTO(
             Map<DayOfWeek, OpeningTime> openingHours
     ) {
         if (openingHours == null) return null;
+
         return openingHours.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> List.of(new OpeningTimeDTO(
-                                e.getValue().getStartTime(),
-                                e.getValue().getEndTime()
-                        ))
+                        entry -> {
+                            OpeningTime openingTime = entry.getValue();
+                            return new OpeningTimeDTO(openingTime.getStartTime(), openingTime.getEndTime());
+                        }
                 ));
     }
 
-    // Map<DayOfWeek, List<OpeningTimeDTO>> → Map<DayOfWeek, OpeningTime>
+    // Map<DayOfWeek, OpeningTimeDTO> → Map<DayOfWeek,OpeningTime>
     default Map<DayOfWeek, OpeningTime> mapOpeningHoursToEntity(
-            Map<DayOfWeek, List<OpeningTimeDTO>> openingHoursDTO
+            Map<DayOfWeek, OpeningTimeDTO> openingHoursDTO
     ) {
         if (openingHoursDTO == null) return null;
-        return openingHoursDTO.entrySet().stream()
+
+       return openingHoursDTO.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().isEmpty() ? null : OpeningTime.builder()
-                                .startTime(e.getValue().getFirst().startTime())
-                                .endTime(e.getValue().getFirst().endTime())
-                                .build()
+                        entry -> {
+                            OpeningTimeDTO openingTimeDTO = entry.getValue();
+                            return OpeningTime.builder()
+                                    .startTime(openingTimeDTO.startTime())
+                                    .endTime(openingTimeDTO.endTime())
+                                    .build();
+                        }
                 ));
     }
 }

@@ -44,22 +44,14 @@ public record GarageRequestDTO(
                 description = "Garage opening hours organized by day of the week",
                 example = """
                 {
-                    "MONDAY": [
-                        { "startTime": "08:00:00", "endTime": "12:00:00" }
-                    ],
-                    "TUESDAY": [
-                        { "startTime": "08:00:00", "endTime": "18:00:00" }
-                    ],
-                    "WEDNESDAY": [
-                        { "startTime": "09:00:00", "endTime": "17:00:00" }
-                    ],
-                    "SATURDAY": [
-                        { "startTime": "09:00:00", "endTime": "13:00:00" }
-                    ]
+                    "MONDAY":{ "startTime": "08:00:00", "endTime": "12:00:00" },
+                    "TUESDAY": { "startTime": "08:00:00", "endTime": "18:00:00" },
+                    "WEDNESDAY": { "startTime": "09:00:00", "endTime": "17:00:00" },
+                    "SATURDAY": { "startTime": "09:00:00", "endTime": "13:00:00" }
                 }
                 """
         )
-        Map<DayOfWeek, List<OpeningTimeDTO>> openingHours,
+        Map<DayOfWeek, OpeningTimeDTO> openingHours,
 
         @Schema(
                 description = "Types of vehicles supported by this garage",

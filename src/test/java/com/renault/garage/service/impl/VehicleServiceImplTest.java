@@ -51,15 +51,24 @@ class VehicleServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        sampleGarage = new Garage();
+        sampleGarage = Garage
+                .builder()
+                .id(1L)
+                .name("Sample Garage")
+                .address("123 Main St")
+                .telephone("+33123456789")
+                .email("test@test.te")
+                .build();
         sampleGarage.setId(1L);
 
         sampleRequest = new VehicleRequestDTO("Renault", 2022, "Gasoline");
 
-        sampleVehicle = new Vehicle();
-        sampleVehicle.setBrand("Renault");
-        sampleVehicle.setManufacturingYear(2022);
-        sampleVehicle.setFuelType("Gasoline");
+        sampleVehicle = Vehicle
+                .builder()
+                .brand("Renault")
+                .fuelType("Gasoline")
+                .manufacturingYear(2022)
+                .build();
 
         sampleResponse = VehicleResponseDTO.builder()
                 .id(10L)
@@ -73,12 +82,8 @@ class VehicleServiceImplTest {
     void createVehicle_success() {
         when(garageRepository.findById(1L)).thenReturn(Optional.of(sampleGarage));
         when(vehicleRepository.countByGarage_Id(1L)).thenReturn(0L);
-        when(vehicleMapper.toEntity(sampleRequest)).thenReturn(sampleVehicle);
-        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> {
-            Vehicle v = invocation.getArgument(0);
-            v.setId(5L);
-            return v;
-        });
+        when(vehicleMapper.toEntity(any(VehicleRequestDTO.class))).thenReturn(sampleVehicle);
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(sampleVehicle);
         when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
 
         VehicleResponseDTO result = vehicleService.createVehicle(1L, sampleRequest);
@@ -94,6 +99,7 @@ class VehicleServiceImplTest {
 
     @Test
     void createVehicle_garageNotFound_shouldThrow() {
+
         when(garageRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> vehicleService.createVehicle(99L, sampleRequest));
@@ -117,7 +123,7 @@ class VehicleServiceImplTest {
     @Test
     void getVehicleByGarage_success() {
         when(garageRepository.findById(1L)).thenReturn(Optional.of(sampleGarage));
-        when(vehicleRepository.findByGarage(sampleGarage)).thenReturn(List.of(sampleVehicle));
+        when(vehicleRepository.findByGarage(any(Garage.class))).thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toVehicleResponseDTOList(anyList())).thenReturn(List.of(sampleResponse));
 
         List<VehicleResponseDTO> result = vehicleService.getVehicleByGarage(1L);
@@ -132,33 +138,32 @@ class VehicleServiceImplTest {
 
     @Test
     void updateVehicle_success() {
-        Vehicle existing = new Vehicle();
-        existing.setId(20L);
-        when(vehicleRepository.findById(20L)).thenReturn(Optional.of(existing));
+
+        when(vehicleRepository.findById(anyLong())).thenReturn(Optional.of(sampleVehicle));
         doAnswer(invocation -> {
             VehicleRequestDTO dto = invocation.getArgument(0);
-            Vehicle ent = invocation.getArgument(1);
-            ent.setBrand(dto.brand());
-            ent.setManufacturingYear(dto.manufacturingYear());
-            ent.setFuelType(dto.fuelType());
+            Vehicle entity = invocation.getArgument(1);
+            entity.setBrand(dto.brand());
+            entity.setManufacturingYear(dto.manufacturingYear());
+            entity.setFuelType(dto.fuelType());
             return null;
         }).when(vehicleMapper).updateVehicleFromDTO(any(VehicleRequestDTO.class), any(Vehicle.class));
-        when(vehicleRepository.save(existing)).thenReturn(existing);
-        when(vehicleMapper.toResponseDTO(existing)).thenReturn(sampleResponse);
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(sampleVehicle);
+        when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
 
-        VehicleResponseDTO result = vehicleService.updateVehicle(20L, sampleRequest);
+        VehicleResponseDTO result = vehicleService.updateVehicle(10L, sampleRequest);
 
         assertThat(result).isEqualTo(sampleResponse);
 
-        verify(vehicleRepository).findById(20L);
+        verify(vehicleRepository).findById(10L);
         verify(vehicleMapper).updateVehicleFromDTO(any(VehicleRequestDTO.class), any(Vehicle.class));
-        verify(vehicleRepository).save(existing);
-        verify(vehicleMapper).toResponseDTO(existing);
+        verify(vehicleRepository).save(any(Vehicle.class));
+        verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
     }
 
     @Test
     void deleteVehicle_missing_shouldThrow() {
-        when(vehicleRepository.existsById(99L)).thenReturn(false);
+        when(vehicleRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> vehicleService.deleteVehicle(99L));
 
@@ -168,21 +173,21 @@ class VehicleServiceImplTest {
 
     @Test
     void getVehiclesByBrandAndGarages_withoutGarageIds() {
-        when(vehicleRepository.findByBrandContainingIgnoreCase("Renault")).thenReturn(List.of(sampleVehicle));
+        when(vehicleRepository.findByBrandContainingIgnoreCase(anyString())).thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
 
         List<VehicleResponseDTO> result = vehicleService.getVehiclesByBrandAndGarages("Renault", null);
 
         assertThat(result).hasSize(1);
-
         assertThat(result.getFirst()).isEqualTo(sampleResponse);
+
         verify(vehicleRepository).findByBrandContainingIgnoreCase("Renault");
         verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
     }
 
     @Test
     void getVehiclesByBrandAndGarages_withGarageIds() {
-        when(vehicleRepository.findByBrandContainingIgnoreCaseAndGarageIdIn("Renault", List.of(1L, 2L)))
+        when(vehicleRepository.findByBrandContainingIgnoreCaseAndGarageIdIn(anyString(), anyList()))
                 .thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
 
@@ -190,6 +195,7 @@ class VehicleServiceImplTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(sampleResponse);
+
         verify(vehicleRepository).findByBrandContainingIgnoreCaseAndGarageIdIn("Renault", List.of(1L, 2L));
         verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
     }

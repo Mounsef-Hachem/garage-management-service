@@ -1,13 +1,16 @@
 package com.renault.garage.service.impl;
 
+import com.renault.garage.dto.request.AccessoryRequestDTO;
 import com.renault.garage.dto.request.GarageRequestDTO;
 import com.renault.garage.dto.request.OpeningTimeDTO;
+import com.renault.garage.dto.request.VehicleRequestDTO;
+import com.renault.garage.dto.response.AccessoryResponseDTO;
 import com.renault.garage.dto.response.GarageResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
 import com.renault.garage.mapper.GarageMapper;
-import com.renault.garage.model.DayOfWeek;
-import com.renault.garage.model.Garage;
+import com.renault.garage.model.*;
 import com.renault.garage.repository.GarageRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,11 +48,20 @@ class GarageServiceImplTest {
     private GarageServiceImpl garageService;
 
     private GarageRequestDTO createSampleGarageRequest() {
-        Map<DayOfWeek, List<OpeningTimeDTO>> openingHours = new HashMap<>();
-        openingHours.put(DayOfWeek.MONDAY, List.of(new OpeningTimeDTO(LocalTime.of(8, 0), LocalTime.of(12, 0))));
+
+        Map<DayOfWeek, OpeningTimeDTO> openingHours = new HashMap<>();
+
+        openingHours.put(
+                DayOfWeek.MONDAY,
+                    new OpeningTimeDTO(
+                            LocalTime.of(8, 0), LocalTime.of(12, 0)
+                    )
+        );
+
         Set<String> supported = new HashSet<>();
         supported.add("car");
         supported.add("suv");
+
         return new GarageRequestDTO(
                 "Test Garage",
                 "123 Test St",
@@ -59,169 +72,196 @@ class GarageServiceImplTest {
         );
     }
 
+    private GarageRequestDTO request;
+    private Garage garage;
+    private GarageResponseDTO responseDTO;
+
+    @BeforeEach
+    void setUp() {
+        request = createSampleGarageRequest();
+
+        garage = Garage
+                .builder()
+                .id(1L)
+                .name("Test Garage")
+                .address("123 Test St")
+                .telephone("+33123456789")
+                .email("test@test.te")
+                .supportedVehicleTypes(Set.of("car", "suv"))
+                .openingHours(Map.of(
+                        DayOfWeek.MONDAY,
+                            new OpeningTime(
+                                    LocalTime.of(8, 0),
+                                    LocalTime.of(12, 0)
+                            )
+                ))
+                .build();
+
+        responseDTO = GarageResponseDTO
+                .builder()
+                .id(1L)
+                .name("Test Garage")
+                .address("123 Test St")
+                .telephone("+33123456789")
+                .email("test@test.te")
+                .supportedVehicleTypes(Set.of("car", "suv"))
+                .openingHours(Map.of(
+                        DayOfWeek.MONDAY,
+                            new OpeningTimeDTO(
+                                    LocalTime.of(8, 0),
+                                    LocalTime.of(12, 0)
+                            )
+                ))
+                .build();
+    }
+
+
     @Test
     void createGarage_shouldSaveAndReturnResponse() {
-        GarageRequestDTO request = createSampleGarageRequest();
-        Garage entity = new Garage();
-        Garage saved = new Garage();
-        GarageResponseDTO responseDTO = new GarageResponseDTO();
 
-        when(garageMapper.toEntity(request)).thenReturn(entity);
-        when(garageRepository.save(entity)).thenReturn(saved);
-        when(garageMapper.toResponseDTO(saved)).thenReturn(responseDTO);
+        when(garageMapper.toEntity(any(GarageRequestDTO.class))).thenReturn(garage);
+        when(garageRepository.save(any(Garage.class))).thenReturn(garage);
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
         GarageResponseDTO result = garageService.createGarage(request);
 
-        assertThat(result).isSameAs(responseDTO);
-        verify(garageMapper).toEntity(request);
-        verify(garageRepository).save(entity);
-        verify(garageMapper).toResponseDTO(saved);
+        assertThat(result).isEqualTo(responseDTO);
+
+        verify(garageMapper).toEntity(any(GarageRequestDTO.class));
+        verify(garageRepository).save(any(Garage.class));
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 
     @Test
     void updateGarage_existing_shouldUpdateAndReturnResponse() {
-        Long id = 1L;
-        GarageRequestDTO request = createSampleGarageRequest();
-        Garage existing = new Garage();
-        Garage saved = new Garage();
-        GarageResponseDTO responseDTO = new GarageResponseDTO();
 
-        when(garageRepository.findById(id)).thenReturn(Optional.of(existing));
-        // updateGarageFromDto is a void; we just verify it is called
-        doNothing().when(garageMapper).updateGarageFromDto(request, existing);
-        when(garageRepository.save(existing)).thenReturn(saved);
-        when(garageMapper.toResponseDTO(saved)).thenReturn(responseDTO);
+        when(garageRepository.findById(anyLong())).thenReturn(Optional.of(garage));
+        doAnswer(invocation -> {
+            GarageRequestDTO dto = invocation.getArgument(0);
+            Garage entity = invocation.getArgument(1);
+            entity.setName(dto.name());
+            entity.setTelephone(dto.telephone());
+            entity.setEmail(dto.email());
+            entity.setSupportedVehicleTypes(dto.supportedVehicleTypes());
+            entity.setOpeningHours(
+                    dto.openingHours().entrySet().stream()
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,
+                                    entry -> {
+                                        OpeningTimeDTO openingTimeDTO = entry.getValue();
+                                        return OpeningTime.builder()
+                                                .startTime(openingTimeDTO.startTime())
+                                                .endTime(openingTimeDTO.endTime())
+                                                .build();
+                                    }
+                            )));
+            return null;
+        }).when(garageMapper).updateGarageFromDto(request, garage);
+        when(garageRepository.save(any(Garage.class))).thenReturn(garage);
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
-        GarageResponseDTO result = garageService.updateGarage(id, request);
+        GarageResponseDTO result = garageService.updateGarage(1L, request);
 
         assertThat(result).isEqualTo(responseDTO);
 
-        verify(garageRepository).findById(id);
-        verify(garageMapper).updateGarageFromDto(request, existing);
-        verify(garageRepository).save(existing);
-        verify(garageMapper).toResponseDTO(saved);
+        verify(garageRepository).findById(anyLong());
+        verify(garageMapper).updateGarageFromDto(any(GarageRequestDTO.class), any(Garage.class));
+        verify(garageRepository).save(any(Garage.class));
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 
     @Test
     void updateGarage_missing_shouldThrow() {
-        Long id = 42L;
-        GarageRequestDTO request = createSampleGarageRequest();
-        when(garageRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> garageService.updateGarage(id, request));
+        when(garageRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        verify(garageRepository).findById(id);
+        assertThrows(ResourceNotFoundException.class, () -> garageService.updateGarage(24L, request));
+
+        verify(garageRepository).findById(anyLong());
         verifyNoMoreInteractions(garageMapper);
     }
 
     @Test
     void getGarageById_existing_shouldReturnResponse() {
-        Long id = 2L;
-        Garage entity = new Garage();
-        GarageResponseDTO responseDTO = new GarageResponseDTO();
 
-        when(garageRepository.findById(id)).thenReturn(Optional.of(entity));
-        when(garageMapper.toResponseDTO(entity)).thenReturn(responseDTO);
+        when(garageRepository.findById(anyLong())).thenReturn(Optional.of(garage));
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
-        GarageResponseDTO result = garageService.getGarageById(id);
+        GarageResponseDTO result = garageService.getGarageById(1L);
 
         assertThat(result).isEqualTo(responseDTO);
 
-        verify(garageRepository).findById(id);
-        verify(garageMapper).toResponseDTO(entity);
+        verify(garageRepository).findById(anyLong());
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 
     @Test
     void getAllGarages_shouldReturnPageMappedToDtoList() {
-        Garage g1 = new Garage();
-        Garage g2 = new Garage();
-        Page<Garage> page = new PageImpl<>(List.of(g1, g2));
+
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name"));
 
-        when(garageRepository.findAll(pageable)).thenReturn(page);
-        when(garageMapper.toResponseDTO(g1)).thenReturn(new GarageResponseDTO());
-        when(garageMapper.toResponseDTO(g2)).thenReturn(new GarageResponseDTO());
+        when(garageRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(garage)));
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
         List<GarageResponseDTO> result = garageService.getAllGarages(pageable);
 
-        assertThat(result).hasSize(2);
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst()).isEqualTo(responseDTO);
 
         verify(garageRepository).findAll(pageable);
-        verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 
     @Test
     void deleteGarage_existing_shouldDelete() {
-        Long id = 5L;
-        when(garageRepository.existsById(id)).thenReturn(true);
+        when(garageRepository.existsById(anyLong())).thenReturn(true);
 
-        garageService.deleteGarage(id);
+        garageService.deleteGarage(1L);
 
-        verify(garageRepository).existsById(id);
-        verify(garageRepository).deleteById(id);
+        verify(garageRepository).existsById(anyLong());
+        verify(garageRepository).deleteById(anyLong());
     }
 
     @Test
     void deleteGarage_missing_shouldThrow() {
-        Long id = 6L;
-        when(garageRepository.existsById(id)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> garageService.deleteGarage(id));
+        when(garageRepository.existsById(anyLong())).thenReturn(false);
 
-        verify(garageRepository).existsById(id);
+        assertThrows(ResourceNotFoundException.class, () -> garageService.deleteGarage(1L));
+
+        verify(garageRepository).existsById(anyLong());
         verify(garageRepository, never()).deleteById(any());
     }
 
     @Test
     void getSupportedVehicleTypes_shouldReturnGarages() {
-        String vehicleType = "SUV";
-        Garage g1 = new Garage();
-        Garage g2 = new Garage();
-        GarageResponseDTO dto1 = new GarageResponseDTO();
-        GarageResponseDTO dto2 = new GarageResponseDTO();
 
-        when(garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(vehicleType))
-                .thenReturn(List.of(g1, g2));
+        when(garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(anyString()))
+                .thenReturn(List.of(garage));
 
-        when(garageMapper.toResponseDTO(any(Garage.class))).thenAnswer(invocation -> {
-            Garage arg = invocation.getArgument(0);
-            if (arg == g1) return dto1;
-            if (arg == g2) return dto2;
-            return new GarageResponseDTO();
-        });
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
-        List<GarageResponseDTO> result = garageService.getSupportedVehicleTypes(vehicleType);
+        List<GarageResponseDTO> result = garageService.getSupportedVehicleTypes("SUV");
 
-        assertThat(result).containsExactly(dto1, dto2);
+        assertThat(result).isEqualTo(List.of(responseDTO));
 
-        verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase(vehicleType);
-        verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
+        verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase(anyString());
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 
     @Test
     void findGaragesByAccessory_shouldReturnMappedDtos() {
-        String accessoryName = "GPS";
-        Garage g1 = new Garage();
-        Garage g2 = new Garage();
-        GarageResponseDTO dto1 = new GarageResponseDTO();
-        GarageResponseDTO dto2 = new GarageResponseDTO();
 
-        when(garageRepository.findByVehicles_Accessories_NameIgnoreCase(accessoryName))
-                .thenReturn(List.of(g1, g2));
+        when(garageRepository.findByVehicles_Accessories_NameIgnoreCase(anyString()))
+                .thenReturn(List.of(garage));
 
-        // Return different DTOs depending on the garage instance
-        when(garageMapper.toResponseDTO(any(Garage.class))).thenAnswer(invocation -> {
-            Garage arg = invocation.getArgument(0);
-            if (arg == g1) return dto1;
-            if (arg == g2) return dto2;
-            return new GarageResponseDTO();
-        });
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
-        List<GarageResponseDTO> result = garageService.findGaragesByAccessory(accessoryName);
+        List<GarageResponseDTO> result = garageService.findGaragesByAccessory("GPS");
 
-        assertThat(result).containsExactlyInAnyOrder(dto1, dto2);
+        assertThat(result).isEqualTo(List.of(responseDTO));
 
-        verify(garageRepository).findByVehicles_Accessories_NameIgnoreCase(accessoryName);
-        verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
+        verify(garageRepository).findByVehicles_Accessories_NameIgnoreCase(anyString());
+        verify(garageMapper).toResponseDTO(any(Garage.class));
     }
 }

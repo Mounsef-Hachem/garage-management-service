@@ -2,10 +2,12 @@ package com.renault.garage.dto.response;
 
 import lombok.*;
 
-@Data
+@Setter
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@ToString
 public class VehicleResponseDTO {
 
     private Long id;
