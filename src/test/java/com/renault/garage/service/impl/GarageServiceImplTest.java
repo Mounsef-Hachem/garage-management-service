@@ -177,14 +177,25 @@ class GarageServiceImplTest {
         String vehicleType = "SUV";
         Garage g1 = new Garage();
         Garage g2 = new Garage();
+        GarageResponseDTO dto1 = new GarageResponseDTO();
+        GarageResponseDTO dto2 = new GarageResponseDTO();
+
         when(garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(vehicleType))
                 .thenReturn(List.of(g1, g2));
 
-        List<Garage> result = garageService.getSupportedVehicleTypes(vehicleType);
+        when(garageMapper.toResponseDTO(any(Garage.class))).thenAnswer(invocation -> {
+            Garage arg = invocation.getArgument(0);
+            if (arg == g1) return dto1;
+            if (arg == g2) return dto2;
+            return new GarageResponseDTO();
+        });
 
-        assertThat(result).containsExactly(g1, g2);
+        List<GarageResponseDTO> result = garageService.getSupportedVehicleTypes(vehicleType);
+
+        assertThat(result).containsExactly(dto1, dto2);
 
         verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase(vehicleType);
+        verify(garageMapper, times(2)).toResponseDTO(any(Garage.class));
     }
 
     @Test
