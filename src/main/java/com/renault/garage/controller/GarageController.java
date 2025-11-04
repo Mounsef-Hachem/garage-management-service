@@ -60,7 +60,7 @@ public class GarageController {
 
     @Operation(summary = "Get garage by supported vehicle")
     @GetMapping("/supported-vehicle/{vehicleType}")
-    public ResponseEntity<List<Garage>> getSupportedVehicleTypes(@PathVariable String vehicleType) {
+    public ResponseEntity<List<GarageResponseDTO>> getSupportedVehicleTypes(@PathVariable String vehicleType) {
         return ResponseEntity.ok(garageService.getSupportedVehicleTypes(vehicleType));
     }
 

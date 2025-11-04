@@ -20,7 +20,7 @@ public interface GarageService {
 
     void deleteGarage(Long id);
 
-    List<Garage> getSupportedVehicleTypes(String vehicle_types);
+    List<GarageResponseDTO> getSupportedVehicleTypes(String vehicle_types);
 
     List<GarageResponseDTO> findGaragesByAccessory(String accessoryName);
 }

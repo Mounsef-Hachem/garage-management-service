@@ -70,9 +70,11 @@ public class GarageServiceImpl implements GarageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Garage> getSupportedVehicleTypes(String vehicleType) {
+    public List<GarageResponseDTO> getSupportedVehicleTypes(String vehicleType) {
         return garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(vehicleType)
-                .stream().toList();
+                .stream()
+                .map(garageMapper::toResponseDTO)
+                .toList();
     }
 
     @Override
