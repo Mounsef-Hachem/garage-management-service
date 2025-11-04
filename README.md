@@ -26,9 +26,9 @@ This application is a REST API to manage garages, vehicles and accessories desig
 
 **Goal**: persist `Map<DayOfWeek, List<OpeningTime>> openingHours` where each day may hold time ranges. 
 
-Project implements the simple approach required by the specification; an alternative, more flexible model is shown for clarity.
+Project implements the simple approach; an alternative, more flexible model is shown for clarity.
 
-**Solution 1** — `@ElementCollection` (implemented, per spec)
+**Solution 1** — `@ElementCollection` (implemented)
 - Simple and compact: suitable when the domain needs at most one opening range per day or when you prefer a minimal schema.
 
 ```java
@@ -83,10 +83,6 @@ public class OpeningTime {
     private LocalTime closeTime;
 }
 ```
-
-**Recommendation:** 
-
-Solution 1 is implemented to match the specification and keep the implementation compact; Solution 2 is preferable if the domain requires multiple ranges per day or advanced time queries.
 
 ---
 
