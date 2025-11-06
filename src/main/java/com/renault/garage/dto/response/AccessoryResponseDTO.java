@@ -3,6 +3,9 @@ package com.renault.garage.dto.response;
 import lombok.*;
 
 @Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccessoryResponseDTO {
 
     private Long id;

@@ -40,18 +40,33 @@ public record GarageRequestDTO(
         @Email(message = "Invalid email format.")
         String email,
 
+
         @Schema(
                 description = "Garage opening hours organized by day of the week",
                 example = """
-                {
-                    "MONDAY":{ "startTime": "08:00:00", "endTime": "12:00:00" },
-                    "TUESDAY": { "startTime": "08:00:00", "endTime": "18:00:00" },
-                    "WEDNESDAY": { "startTime": "09:00:00", "endTime": "17:00:00" },
-                    "SATURDAY": { "startTime": "09:00:00", "endTime": "13:00:00" }
-                }
+                    {
+                      "MONDAY": {
+                        "openingTimes": [
+                          { "startTime": "08:00:00", "endTime": "12:00:00" },
+                          { "startTime": "14:00:00", "endTime": "18:00:00" }
+                        ]
+                      },
+                      "TUESDAY": {
+                        "openingTimes": [
+                          { "startTime": "08:00:00", "endTime": "12:00:00" },
+                          { "startTime": "14:00:00", "endTime": "18:00:00" }
+                        ]
+                      },
+                      "WEDNESDAY": {
+                        "openingTimes": [
+                          { "startTime": "08:00:00", "endTime": "12:00:00" },
+                          { "startTime": "14:00:00", "endTime": "18:00:00" }
+                        ]
+                      }
+                    }
                 """
         )
-        Map<DayOfWeek, OpeningTimeDTO> openingHours,
+        Map<DayOfWeek, OpeningHourDTO> openingHours,
 
         @Schema(
                 description = "Types of vehicles supported by this garage",

@@ -22,71 +22,9 @@ This application is a REST API to manage garages, vehicles and accessories desig
 - /api/vehicles — create (in garage), update, delete, list by garage, search by brand (optional garageIds)
 - /api/accessories — add to vehicle, update, delete, list by vehicle
 
-### **6) Persisting opening hours**
-
-**Goal**: persist `Map<DayOfWeek, List<OpeningTime>> openingHours` where each day may hold time ranges. 
-
-Project implements the simple approach; an alternative, more flexible model is shown for clarity.
-
-**Solution 1** — `@ElementCollection` (implemented)
-- Simple and compact: suitable when the domain needs at most one opening range per day or when you prefer a minimal schema.
-
-```java
-@Embeddable
-public class OpeningTime {
-    private LocalTime openTime;
-    private LocalTime closeTime;
-}
-
-@Entity
-public class Garage {
-    @Id @GeneratedValue
-    private Long id;
-
-    @ElementCollection
-    @CollectionTable(name = "garage_opening_times", joinColumns = @JoinColumn(name = "garage_id"))
-    @MapKeyColumn(name = "day_of_week")
-    private Map<DayOfWeek, OpeningTime> openingHours = new HashMap<>();
-}
-```
-
-**Solution 2** — Dedicated entities (`@OneToMany`) — (alternative)
-- Use when you need multiple ranges per day.
-
-```java
-@Entity
-public class Garage {
-    @Id @GeneratedValue
-    private Long id;
-
-    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OpeningHour> openingHours = new ArrayList<>();
-}
-
-@Entity
-public class OpeningHour {
-    @Id @GeneratedValue
-    private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private DayOfWeek dayOfWeek;
-
-    @OneToMany(mappedBy = "openingHour", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OpeningTime> openingTimes = new ArrayList<>();
-}
-
-@Entity
-public class OpeningTime {
-    @Id @GeneratedValue
-    private Long id;
-    private LocalTime openTime;
-    private LocalTime closeTime;
-}
-```
-
 ---
 
-### **7) Running & testing**
+### **6) Running & testing**
 
 - **Run the application**
 
@@ -143,7 +81,7 @@ public class OpeningTime {
 
 ---
 
-### **8) Kafka Integration**
+### **7) Kafka Integration**
 
 The project integrates Apache Kafka for event-driven communication.
 
