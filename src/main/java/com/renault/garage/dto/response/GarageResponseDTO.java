@@ -1,7 +1,9 @@
 package com.renault.garage.dto.response;
 
+import com.renault.garage.dto.request.OpeningHourDTO;
 import com.renault.garage.dto.request.OpeningTimeDTO;
 import com.renault.garage.model.DayOfWeek;
+import com.renault.garage.model.OpeningHour;
 import lombok.*;
 
 import java.util.List;
@@ -19,6 +21,6 @@ public class GarageResponseDTO {
     private String address;
     private String telephone;
     private String email;
-    private Map<DayOfWeek, OpeningTimeDTO> openingHours;
+    private Map<DayOfWeek, OpeningHourDTO> openingHours;
     private Set<String> supportedVehicleTypes;
 }

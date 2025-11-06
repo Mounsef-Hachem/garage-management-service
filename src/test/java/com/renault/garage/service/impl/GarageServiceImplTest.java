@@ -1,10 +1,6 @@
 package com.renault.garage.service.impl;
 
-import com.renault.garage.dto.request.AccessoryRequestDTO;
-import com.renault.garage.dto.request.GarageRequestDTO;
-import com.renault.garage.dto.request.OpeningTimeDTO;
-import com.renault.garage.dto.request.VehicleRequestDTO;
-import com.renault.garage.dto.response.AccessoryResponseDTO;
+import com.renault.garage.dto.request.*;
 import com.renault.garage.dto.response.GarageResponseDTO;
 import com.renault.garage.exception.ResourceNotFoundException;
 import com.renault.garage.mapper.GarageMapper;
@@ -16,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,13 +44,22 @@ class GarageServiceImplTest {
 
     private GarageRequestDTO createSampleGarageRequest() {
 
-        Map<DayOfWeek, OpeningTimeDTO> openingHours = new HashMap<>();
+        Map<DayOfWeek, OpeningHourDTO> openingHours = new HashMap<>();
 
         openingHours.put(
                 DayOfWeek.MONDAY,
-                    new OpeningTimeDTO(
-                            LocalTime.of(8, 0), LocalTime.of(12, 0)
-                    )
+                new OpeningHourDTO(
+                        List.of(
+                                new OpeningTimeDTO(
+                                        LocalTime.of(8, 0),
+                                        LocalTime.of(12, 0)
+                                ),
+                                new OpeningTimeDTO(
+                                        LocalTime.of(14, 0),
+                                        LocalTime.of(18, 0)
+                                )
+                        )
+                )
         );
 
         Set<String> supported = new HashSet<>();
@@ -88,12 +92,22 @@ class GarageServiceImplTest {
                 .telephone("+33123456789")
                 .email("test@test.te")
                 .supportedVehicleTypes(Set.of("car", "suv"))
-                .openingHours(Map.of(
-                        DayOfWeek.MONDAY,
-                            new OpeningTime(
-                                    LocalTime.of(8, 0),
-                                    LocalTime.of(12, 0)
-                            )
+                .openingHours(
+                        Map.of(
+                            DayOfWeek.MONDAY,
+                            OpeningHour.builder()
+                                    .openingTimes(List.of(
+                                            OpeningTime.builder()
+                                                    .startTime(LocalTime.of(8, 0))
+                                                    .endTime(LocalTime.of(12, 0))
+                                                    .build(),
+
+                                            OpeningTime.builder()
+                                                    .startTime(LocalTime.of(14, 0))
+                                                    .endTime(LocalTime.of(18, 0))
+                                                    .build()
+                                    ))
+                                    .build()
                 ))
                 .build();
 
@@ -105,13 +119,16 @@ class GarageServiceImplTest {
                 .telephone("+33123456789")
                 .email("test@test.te")
                 .supportedVehicleTypes(Set.of("car", "suv"))
-                .openingHours(Map.of(
-                        DayOfWeek.MONDAY,
-                            new OpeningTimeDTO(
-                                    LocalTime.of(8, 0),
-                                    LocalTime.of(12, 0)
-                            )
-                ))
+                .openingHours(
+                        Map.of(
+                                DayOfWeek.MONDAY,
+                                OpeningHourDTO.builder()
+                                        .openingTimes(List.of(
+                                                new OpeningTimeDTO(LocalTime.of(8, 0),LocalTime.of(12, 0)),
+                                                new OpeningTimeDTO(LocalTime.of(14, 0),LocalTime.of(18, 0))
+                                        ))
+                                        .build()
+                        ))
                 .build();
     }
 
@@ -148,11 +165,19 @@ class GarageServiceImplTest {
                             .collect(Collectors.toMap(
                                     Map.Entry::getKey,
                                     entry -> {
-                                        OpeningTimeDTO openingTimeDTO = entry.getValue();
-                                        return OpeningTime.builder()
-                                                .startTime(openingTimeDTO.startTime())
-                                                .endTime(openingTimeDTO.endTime())
-                                                .build();
+                                        OpeningHourDTO openingHourDTO = entry.getValue();
+                                        OpeningHour openingHour = new OpeningHour();
+                                        List<OpeningTime> openingTimes = openingHourDTO.getOpeningTimes().stream()
+                                                .map(openingTimeDTO -> {
+                                                    OpeningTime openingTime = new OpeningTime();
+                                                    openingTime.setStartTime(openingTimeDTO.startTime());
+                                                    openingTime.setEndTime(openingTimeDTO.endTime());
+                                                    openingTime.setOpeningHour(openingHour);
+                                                    return openingTime;
+                                                })
+                                                .collect(Collectors.toList());
+                                        openingHour.setOpeningTimes(openingTimes);
+                                        return openingHour;
                                     }
                             )));
             return null;

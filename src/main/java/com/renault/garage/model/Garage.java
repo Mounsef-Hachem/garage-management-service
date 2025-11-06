@@ -28,16 +28,17 @@ public class Garage {
     private String telephone;
     private String email;
 
-    @ElementCollection
-    @CollectionTable(name = "garage_opening_times", joinColumns = @JoinColumn(name = "garage_id"))
+    @OneToMany(cascade = CascadeType.ALL)
+    @MapKeyEnumerated(EnumType.STRING)
     @MapKeyColumn(name = "day_of_week")
-    private Map<DayOfWeek, OpeningTime> openingHours = new HashMap<>();
+    @JoinColumn(name = "garage_id")
+    private Map<DayOfWeek, OpeningHour> openingHours = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "garage_supported_vehicle_types", joinColumns = @JoinColumn(name = "garage_id"))
     @Column(name = "vehicle_type")
     private Set<String> supportedVehicleTypes = new HashSet<>();
 
-    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vehicle> vehicles = new ArrayList<>();
 }

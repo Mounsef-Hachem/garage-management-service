@@ -1,10 +1,12 @@
 package com.renault.garage.mapper;
 
+import com.renault.garage.dto.request.OpeningHourDTO;
 import com.renault.garage.dto.request.OpeningTimeDTO;
 import com.renault.garage.dto.request.GarageRequestDTO;
 import com.renault.garage.dto.response.GarageResponseDTO;
 import com.renault.garage.model.DayOfWeek;
 import com.renault.garage.model.Garage;
+import com.renault.garage.model.OpeningHour;
 import com.renault.garage.model.OpeningTime;
 import org.mapstruct.*;
 
@@ -24,13 +26,12 @@ public interface GarageMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
-    @Mapping(target = "openingHours", expression = "java(mapOpeningHoursToEntity(dto.openingHours()))")
     void updateGarageFromDto(GarageRequestDTO dto, @MappingTarget Garage garage);
 
 
-    // Map<DayOfWeek, OpeningTime> → Map<DayOfWeek, OpeningTimeDTO>
-    default Map<DayOfWeek, OpeningTimeDTO> mapOpeningHoursToDTO(
-            Map<DayOfWeek, OpeningTime> openingHours
+    // Map<DayOfWeek, OpeningHourDTO> → Map<DayOfWeek, OpeningHourDTO>
+    default Map<DayOfWeek, OpeningHourDTO> mapOpeningHoursToDTO(
+            Map<DayOfWeek, OpeningHour> openingHours
     ) {
         if (openingHours == null) return null;
 
@@ -38,27 +39,43 @@ public interface GarageMapper {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> {
-                            OpeningTime openingTime = entry.getValue();
-                            return new OpeningTimeDTO(openingTime.getStartTime(), openingTime.getEndTime());
+                            OpeningHour openingHour = entry.getValue();
+                            List<OpeningTimeDTO> openingTimeDTOs = openingHour.getOpeningTimes().stream()
+                                    .map(openingTime -> new OpeningTimeDTO(
+                                            openingTime.getStartTime(),
+                                            openingTime.getEndTime()
+                                    ))
+                                    .collect(Collectors.toList());
+                            OpeningHourDTO openingHourDTO = new OpeningHourDTO();
+                            openingHourDTO.setOpeningTimes(openingTimeDTOs);
+                            return openingHourDTO;
                         }
                 ));
     }
 
-    // Map<DayOfWeek, OpeningTimeDTO> → Map<DayOfWeek,OpeningTime>
-    default Map<DayOfWeek, OpeningTime> mapOpeningHoursToEntity(
-            Map<DayOfWeek, OpeningTimeDTO> openingHoursDTO
+    // Map<DayOfWeek, OpeningHourDTO> → Map<DayOfWeek,OpeningHour>
+    default Map<DayOfWeek, OpeningHour> mapOpeningHoursToEntity(
+            Map<DayOfWeek, OpeningHourDTO> openingHoursDTO
     ) {
         if (openingHoursDTO == null) return null;
 
-       return openingHoursDTO.entrySet().stream()
+        return openingHoursDTO.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> {
-                            OpeningTimeDTO openingTimeDTO = entry.getValue();
-                            return OpeningTime.builder()
-                                    .startTime(openingTimeDTO.startTime())
-                                    .endTime(openingTimeDTO.endTime())
-                                    .build();
+                            OpeningHourDTO openingHourDTO = entry.getValue();
+                            OpeningHour openingHour = new OpeningHour();
+                            List<OpeningTime> openingTimes = openingHourDTO.getOpeningTimes().stream()
+                                    .map(openingTimeDTO -> {
+                                        OpeningTime openingTime = new OpeningTime();
+                                        openingTime.setStartTime(openingTimeDTO.startTime());
+                                        openingTime.setEndTime(openingTimeDTO.endTime());
+                                        openingTime.setOpeningHour(openingHour);
+                                        return openingTime;
+                                    })
+                                    .collect(Collectors.toList());
+                            openingHour.setOpeningTimes(openingTimes);
+                            return openingHour;
                         }
                 ));
     }
