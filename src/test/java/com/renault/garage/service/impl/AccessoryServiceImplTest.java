@@ -85,8 +85,8 @@ class AccessoryServiceImplTest {
         assertThat(result).isEqualTo(responseDTO);
 
         verify(vehicleRepository).findById(1L);
-        verify(accessoryRepository).save(any(Accessory.class));
-        verify(accessoryMapper).toResponseDTO(any(Accessory.class));
+        verify(accessoryRepository).save(accessoryEntity);
+        verify(accessoryMapper).toResponseDTO(accessoryEntity);
     }
 
     @Test
@@ -121,9 +121,9 @@ class AccessoryServiceImplTest {
         assertThat(result).isEqualTo(responseDTO);
 
         verify(accessoryRepository).findById(1L);
-        verify(accessoryMapper).updateAccessory(any(AccessoryRequestDTO.class), any(Accessory.class));
-        verify(accessoryRepository).save(any(Accessory.class));
-        verify(accessoryMapper).toResponseDTO(any(Accessory.class));
+        verify(accessoryMapper).updateAccessory(requestDTO, accessoryEntity);
+        verify(accessoryRepository).save(accessoryEntity);
+        verify(accessoryMapper).toResponseDTO(accessoryEntity);
     }
 
     @Test
@@ -146,7 +146,7 @@ class AccessoryServiceImplTest {
         assertThat(result.getFirst()).isEqualTo(responseDTO);
 
         verify(accessoryRepository).findByVehicle_Id(1L);
-        verify(accessoryMapper).toResponseDTO(any(Accessory.class));
+        verify(accessoryMapper).toResponseDTO(accessoryEntity);
     }
 
     @Test

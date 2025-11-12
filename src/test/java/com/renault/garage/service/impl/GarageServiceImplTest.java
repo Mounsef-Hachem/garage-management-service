@@ -144,9 +144,9 @@ class GarageServiceImplTest {
 
         assertThat(result).isEqualTo(responseDTO);
 
-        verify(garageMapper).toEntity(any(GarageRequestDTO.class));
-        verify(garageRepository).save(any(Garage.class));
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageMapper).toEntity(request);
+        verify(garageRepository).save(garage);
+        verify(garageMapper).toResponseDTO(garage);
     }
 
     @Test
@@ -190,9 +190,9 @@ class GarageServiceImplTest {
         assertThat(result).isEqualTo(responseDTO);
 
         verify(garageRepository).findById(anyLong());
-        verify(garageMapper).updateGarageFromDto(any(GarageRequestDTO.class), any(Garage.class));
-        verify(garageRepository).save(any(Garage.class));
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageMapper).updateGarageFromDto(request, garage);
+        verify(garageRepository).save(garage);
+        verify(garageMapper).toResponseDTO(garage);
     }
 
     @Test
@@ -202,7 +202,7 @@ class GarageServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> garageService.updateGarage(24L, request));
 
-        verify(garageRepository).findById(anyLong());
+        verify(garageRepository).findById(24L);
         verifyNoMoreInteractions(garageMapper);
     }
 
@@ -216,8 +216,8 @@ class GarageServiceImplTest {
 
         assertThat(result).isEqualTo(responseDTO);
 
-        verify(garageRepository).findById(anyLong());
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageRepository).findById(1L);
+        verify(garageMapper).toResponseDTO(garage);
     }
 
     @Test
@@ -234,7 +234,7 @@ class GarageServiceImplTest {
         assertThat(result.getFirst()).isEqualTo(responseDTO);
 
         verify(garageRepository).findAll(pageable);
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageMapper).toResponseDTO(garage);
     }
 
     @Test
@@ -243,8 +243,8 @@ class GarageServiceImplTest {
 
         garageService.deleteGarage(1L);
 
-        verify(garageRepository).existsById(anyLong());
-        verify(garageRepository).deleteById(anyLong());
+        verify(garageRepository).existsById(1L);
+        verify(garageRepository).deleteById(1L);
     }
 
     @Test
@@ -254,8 +254,8 @@ class GarageServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> garageService.deleteGarage(1L));
 
-        verify(garageRepository).existsById(anyLong());
-        verify(garageRepository, never()).deleteById(any());
+        verify(garageRepository).existsById(1L);
+        verify(garageRepository, never()).deleteById(1L);
     }
 
     @Test
@@ -270,8 +270,8 @@ class GarageServiceImplTest {
 
         assertThat(result).isEqualTo(List.of(responseDTO));
 
-        verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase(anyString());
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageRepository).findBySupportedVehicleTypesContainingIgnoreCase("SUV");
+        verify(garageMapper).toResponseDTO(garage);
     }
 
     @Test
@@ -286,7 +286,7 @@ class GarageServiceImplTest {
 
         assertThat(result).isEqualTo(List.of(responseDTO));
 
-        verify(garageRepository).findByVehicles_Accessories_NameIgnoreCase(anyString());
-        verify(garageMapper).toResponseDTO(any(Garage.class));
+        verify(garageRepository).findByVehicles_Accessories_NameIgnoreCase("GPS");
+        verify(garageMapper).toResponseDTO(garage);
     }
 }
