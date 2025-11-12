@@ -57,7 +57,7 @@ class VehicleIntegrationTest {
     }
 
     @Test
-    void createVehicle_integration_success() throws Exception {
+    void createVehicle_success_integration() throws Exception {
         VehicleRequestDTO requestDTO = new VehicleRequestDTO("Renault", 2020, "Diesel");
 
         mockMvc.perform(post("/api/vehicles/{garageId}", garage.getId())

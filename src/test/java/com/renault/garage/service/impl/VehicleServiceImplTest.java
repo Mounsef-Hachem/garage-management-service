@@ -92,9 +92,9 @@ class VehicleServiceImplTest {
 
         verify(garageRepository).findById(1L);
         verify(vehicleRepository).countByGarage_Id(1L);
-        verify(vehicleRepository).save(any(Vehicle.class));
-        verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
-        verify(eventPublisher).publishVehicleCreated(any(VehicleResponseDTO.class));
+        verify(vehicleRepository).save(sampleVehicle);
+        verify(vehicleMapper).toResponseDTO(sampleVehicle);
+        verify(eventPublisher).publishVehicleCreated(sampleResponse);
     }
 
     @Test
@@ -117,7 +117,7 @@ class VehicleServiceImplTest {
 
         verify(garageRepository).findById(1L);
         verify(vehicleRepository).countByGarage_Id(1L);
-        verify(vehicleRepository, never()).save(any());
+        verify(vehicleRepository, never()).save(sampleVehicle);
     }
 
     @Test
@@ -133,7 +133,7 @@ class VehicleServiceImplTest {
 
         verify(garageRepository).findById(1L);
         verify(vehicleRepository).findByGarage(sampleGarage);
-        verify(vehicleMapper).toVehicleResponseDTOList(anyList());
+        verify(vehicleMapper).toVehicleResponseDTOList(List.of(sampleVehicle));
     }
 
     @Test
@@ -156,9 +156,9 @@ class VehicleServiceImplTest {
         assertThat(result).isEqualTo(sampleResponse);
 
         verify(vehicleRepository).findById(10L);
-        verify(vehicleMapper).updateVehicleFromDTO(any(VehicleRequestDTO.class), any(Vehicle.class));
-        verify(vehicleRepository).save(any(Vehicle.class));
-        verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
+        verify(vehicleMapper).updateVehicleFromDTO(sampleRequest, sampleVehicle);
+        verify(vehicleRepository).save(sampleVehicle);
+        verify(vehicleMapper).toResponseDTO(sampleVehicle);
     }
 
     @Test
@@ -168,7 +168,7 @@ class VehicleServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> vehicleService.deleteVehicle(99L));
 
         verify(vehicleRepository).existsById(99L);
-        verify(vehicleRepository, never()).deleteById(anyLong());
+        verify(vehicleRepository, never()).deleteById(99L);
     }
 
     @Test
@@ -182,7 +182,7 @@ class VehicleServiceImplTest {
         assertThat(result.getFirst()).isEqualTo(sampleResponse);
 
         verify(vehicleRepository).findByBrandContainingIgnoreCase("Renault");
-        verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
+        verify(vehicleMapper).toResponseDTO(sampleVehicle);
     }
 
     @Test
@@ -197,7 +197,7 @@ class VehicleServiceImplTest {
         assertThat(result.getFirst()).isEqualTo(sampleResponse);
 
         verify(vehicleRepository).findByBrandContainingIgnoreCaseAndGarageIdIn("Renault", List.of(1L, 2L));
-        verify(vehicleMapper).toResponseDTO(any(Vehicle.class));
+        verify(vehicleMapper).toResponseDTO(sampleVehicle);
     }
 }
 
