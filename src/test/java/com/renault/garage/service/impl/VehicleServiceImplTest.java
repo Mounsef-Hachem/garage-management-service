@@ -79,7 +79,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void createVehicle_success() {
+    void createVehicle_should_SaveAndReturnVehicleResponseDTO_when_GarageFoundAndValidRequestIsProvided() {
         when(garageRepository.findById(1L)).thenReturn(Optional.of(sampleGarage));
         when(vehicleRepository.countByGarage_Id(1L)).thenReturn(0L);
         when(vehicleMapper.toEntity(any(VehicleRequestDTO.class))).thenReturn(sampleVehicle);
@@ -98,7 +98,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void createVehicle_garageNotFound_shouldThrow() {
+    void createVehicle_should_ThrowResourceNotFoundException_when_GarageNotFound() {
 
         when(garageRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -109,7 +109,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void createVehicle_quotaExceeded_shouldThrow() {
+    void createVehicle_shouldThrowStorageLimitExceededException_when_QuotaExceeded() {
         when(garageRepository.findById(1L)).thenReturn(Optional.of(sampleGarage));
         when(vehicleRepository.countByGarage_Id(1L)).thenReturn(50L); // quota reached
 
@@ -121,7 +121,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void getVehicleByGarage_success() {
+    void getVehicleByGarage_should_ReturnListOfVehicleResponseDTO_when_GarageFound() {
         when(garageRepository.findById(1L)).thenReturn(Optional.of(sampleGarage));
         when(vehicleRepository.findByGarage(any(Garage.class))).thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toVehicleResponseDTOList(anyList())).thenReturn(List.of(sampleResponse));
@@ -137,7 +137,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void updateVehicle_success() {
+    void updateVehicle_should_ReturnVehicleResponseDTO_when_ValidRequestIsProvided() {
 
         when(vehicleRepository.findById(anyLong())).thenReturn(Optional.of(sampleVehicle));
         doAnswer(invocation -> {
@@ -162,7 +162,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void deleteVehicle_missing_shouldThrow() {
+    void deleteVehicle_shouldThrowResourceNotFoundException_when_VehicleNotExist() {
         when(vehicleRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> vehicleService.deleteVehicle(99L));
@@ -172,7 +172,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void getVehiclesByBrandAndGarages_withoutGarageIds() {
+    void getVehiclesByBrandAndGarages_WithoutGarageIds_should_ReturnListOfVehicleResponseDTO_when_ValidBrandAndWithoutGarageIds() {
         when(vehicleRepository.findByBrandContainingIgnoreCase(anyString())).thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
 
@@ -186,7 +186,7 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void getVehiclesByBrandAndGarages_withGarageIds() {
+    void getVehiclesByBrandAndGarages_WithGarageIds_should_ReturnListOfVehicleResponseDTO_when_ValidBrandAndWithGarageIds() {
         when(vehicleRepository.findByBrandContainingIgnoreCaseAndGarageIdIn(anyString(), anyList()))
                 .thenReturn(List.of(sampleVehicle));
         when(vehicleMapper.toResponseDTO(any(Vehicle.class))).thenReturn(sampleResponse);
