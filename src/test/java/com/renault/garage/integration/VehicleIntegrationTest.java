@@ -57,7 +57,7 @@ class VehicleIntegrationTest {
     }
 
     @Test
-    void createVehicle_success_integration() throws Exception {
+    void createVehicle_should_CreateVehicle_when_GarageExistsAndHasCapacity() throws Exception {
         VehicleRequestDTO requestDTO = new VehicleRequestDTO("Renault", 2020, "Diesel");
 
         mockMvc.perform(post("/api/vehicles/{garageId}", garage.getId())
@@ -69,7 +69,6 @@ class VehicleIntegrationTest {
                 .andExpect(jsonPath("$.fuelType").value("Diesel"));
 
 
-        // Verify the vehicle is actually persisted
         List<Vehicle> vehicles = vehicleRepository.findAll();
         assertThat(vehicles).hasSize(1);
         assertThat(vehicles.getFirst().getBrand()).isEqualTo("Renault");

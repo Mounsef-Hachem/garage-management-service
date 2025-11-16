@@ -27,23 +27,23 @@ public class VehicleController {
     }
 
     @Operation(summary = "Update an existing vehicle by ID")
-    @PutMapping("/{id}")
-    public ResponseEntity<VehicleResponseDTO> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequestDTO dto) {
-        return ResponseEntity.ok(vehicleService.updateVehicle(id, dto));
+    @PutMapping("/{vehicleId}")
+    public ResponseEntity<VehicleResponseDTO> updateVehicle(@PathVariable Long vehicleId, @RequestBody VehicleRequestDTO dto) {
+        return ResponseEntity.ok(vehicleService.updateVehicle(vehicleId, dto));
     }
 
     @Operation(summary = "Delete a vehicle by ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
-        vehicleService.deleteVehicle(id);
+    @DeleteMapping("/{vehicleId}")
+    public ResponseEntity<Void> deleteVehicle(@PathVariable Long vehicleId) {
+        vehicleService.deleteVehicle(vehicleId);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Get all vehicles of a given garage")
-    @GetMapping("/garage/{id}")
+    @GetMapping("/garage/{garageId}")
     public ResponseEntity<List<VehicleResponseDTO>> getVehiclesByGarage(
-            @PathVariable Long id) {
-        return ResponseEntity.ok(vehicleService.getVehicleByGarage(id));
+            @PathVariable Long garageId) {
+        return ResponseEntity.ok(vehicleService.getVehicleByGarage(garageId));
     }
 
 

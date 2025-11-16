@@ -131,7 +131,7 @@ class GarageServiceImplTest {
 
 
     @Test
-    void createGarage_shouldSaveAndReturnResponse() {
+    void createGarage_should_SaveAndReturnGarageResponseDTO_when_ValidRequestIsProvided() {
 
         when(garageMapper.toEntity(any(GarageRequestDTO.class))).thenReturn(garage);
         when(garageRepository.save(any(Garage.class))).thenReturn(garage);
@@ -147,7 +147,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void updateGarage_existing_shouldUpdateAndReturnResponse() {
+    void updateGarage_should_UpdateAndReturnResponse_when_ValidRequestIsProvidedAndGarageExist() {
 
         when(garageRepository.findById(anyLong())).thenReturn(Optional.of(garage));
         doAnswer(invocation -> {
@@ -193,7 +193,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void updateGarage_missing_shouldThrow() {
+    void updateGarage_should_ThrowResourceNotFoundException_when_GarageMissing() {
 
         when(garageRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -204,7 +204,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void getGarageById_existing_shouldReturnResponse() {
+    void getGarageById_should_ReturnGarageResponseDTO_when_GarageExist() {
 
         when(garageRepository.findById(anyLong())).thenReturn(Optional.of(garage));
         when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
@@ -218,7 +218,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void getAllGarages_shouldReturnPageMappedToDtoList() {
+    void getAllGarages_shouldReturnPageMappedToListOfGarageResponseDTO() {
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name"));
 
@@ -238,7 +238,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void deleteGarage_existing_shouldDelete() {
+    void deleteGarage_shouldDelete_when_GarageExist() {
         when(garageRepository.existsById(anyLong())).thenReturn(true);
 
         garageService.deleteGarage(1L);
@@ -248,7 +248,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void deleteGarage_missing_shouldThrow() {
+    void deleteGarage_shouldThrowResourceNotFoundException_when_GarageNotExist() {
 
         when(garageRepository.existsById(anyLong())).thenReturn(false);
 
@@ -259,7 +259,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void getSupportedVehicleTypes_shouldReturnGarages() {
+    void getSupportedVehicleTypes_shouldReturnListOfGarageResponseDTO_when_MatchingVehicleTypesExist() {
 
         when(garageRepository.findBySupportedVehicleTypesContainingIgnoreCase(anyString()))
                 .thenReturn(List.of(garage));
@@ -275,7 +275,7 @@ class GarageServiceImplTest {
     }
 
     @Test
-    void findGaragesByAccessory_shouldReturnMappedDtos() {
+    void findGaragesByAccessory_shouldReturnListOfGarageResponseDTO_when_MatchingAccessoryNameExist() {
 
         when(garageRepository.findByVehicles_Accessories_NameIgnoreCase(anyString()))
                 .thenReturn(List.of(garage));
