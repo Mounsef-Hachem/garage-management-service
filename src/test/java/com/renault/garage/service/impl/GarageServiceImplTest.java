@@ -12,10 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -225,13 +222,16 @@ class GarageServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name"));
 
-        when(garageRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(garage)));
+        when(garageRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(garage), pageable, 1));
         when(garageMapper.toResponseDTO(any(Garage.class))).thenReturn(responseDTO);
 
-        List<GarageResponseDTO> result = garageService.getAllGarages(pageable);
+        Page<GarageResponseDTO> result = garageService.getAllGarages(pageable);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst()).isEqualTo(responseDTO);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst()).isEqualTo(responseDTO);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getNumber()).isEqualTo(0);
+        assertThat(result.getSize()).isEqualTo(10);
 
         verify(garageRepository).findAll(pageable);
         verify(garageMapper).toResponseDTO(garage);

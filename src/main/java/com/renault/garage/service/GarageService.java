@@ -2,11 +2,9 @@ package com.renault.garage.service;
 
 import com.renault.garage.dto.request.GarageRequestDTO;
 import com.renault.garage.dto.response.GarageResponseDTO;
-import com.renault.garage.model.Garage;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
-import java.util.Set;
 
 public interface GarageService {
 
@@ -16,7 +14,7 @@ public interface GarageService {
 
     GarageResponseDTO getGarageById(Long id);
 
-    List<GarageResponseDTO> getAllGarages(Pageable pageable);
+    Page<GarageResponseDTO> getAllGarages(Pageable pageable);
 
     void deleteGarage(Long id);
 
