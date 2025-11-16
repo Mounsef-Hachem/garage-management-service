@@ -8,6 +8,7 @@ import com.renault.garage.service.GarageService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -43,7 +44,7 @@ public class GarageController {
 
     @Operation(summary = "get all paginated with sorting options (by name, city, etc.).")
     @GetMapping
-    public ResponseEntity<List<GarageResponseDTO>> getAllGarages(
+    public ResponseEntity<Page<GarageResponseDTO>> getAllGarages(
             @ParameterObject
             @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC)
             Pageable pageable

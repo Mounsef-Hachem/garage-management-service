@@ -8,13 +8,12 @@ import com.renault.garage.model.Garage;
 import com.renault.garage.repository.GarageRepository;
 import com.renault.garage.service.GarageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,11 +52,9 @@ public class GarageServiceImpl implements GarageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GarageResponseDTO> getAllGarages(Pageable pageable) {
+    public Page<GarageResponseDTO> getAllGarages(Pageable pageable) {
         return garageRepository.findAll(pageable)
-                .stream()
-                .map(garageMapper::toResponseDTO)
-                .toList();
+                .map(garageMapper::toResponseDTO);
     }
 
     @Override
